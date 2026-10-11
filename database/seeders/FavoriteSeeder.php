@@ -28,7 +28,7 @@ class FavoriteSeeder extends Seeder
             $bookIds = collect($favorites[$index])
                 ->map(fn ($bookIndex) => $books[$bookIndex]->id);
 
-            $user->favorites()->syncWithoutDetaching($bookIds);
+            $user->favoriteBooks()->syncWithoutDetaching($bookIds);
         }
     }
 }

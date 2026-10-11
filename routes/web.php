@@ -1,18 +1,45 @@
 <?php
 
+use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+// ゲストでも閲覧できる
+Route::get('/', [BookController::class, 'index'])->name('books.index');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/books/{book}', [BookController::class, 'show'])
+    ->whereNumber('book')
+    ->name('books.show');
+
+Route::view('/ranking', 'ranking.index')->name('ranking.index');
+
+// ログインが必要
+Route::middleware('auth')->group(function () {
+    Route::resource('books', BookController::class)
+        ->except(['index', 'show']);
+
+    Route::view('/favorites', 'favorites.index')->name('favorites.index');
+    Route::view('/genres', 'genres.index')->name('genres.index');
+
+    // 以下は各機能を実装するまでの仮ルート
+    Route::post('/books/{book}/favorite', function () {
+        return back();
+    })->name('favorites.toggle');
+
+    Route::post('/books/{book}/reviews', function () {
+        return back();
+    })->name('reviews.store');
+
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::post('/{review}/like', function () {
+            return back();
+        })->name('like');
+
+        Route::get('/{review}/edit', function () {
+            return back();
+        })->name('edit');
+
+        Route::delete('/{review}', function () {
+            return back();
+        })->name('destroy');
+    });
 });
