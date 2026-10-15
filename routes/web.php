@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\GenreController;
 use Illuminate\Support\Facades\Route;
 
 // ゲストでも閲覧できる
@@ -18,7 +19,8 @@ Route::middleware('auth')->group(function () {
         ->except(['index', 'show']);
 
     Route::view('/favorites', 'favorites.index')->name('favorites.index');
-    Route::view('/genres', 'genres.index')->name('genres.index');
+
+    Route::resource('genres', GenreController::class);
 
     // 以下は各機能を実装するまでの仮ルート
     Route::post('/books/{book}/favorite', function () {
