@@ -27,7 +27,7 @@ class StoreBookRequest extends FormRequest
             'isbn' => ['required', 'digits:13', 'unique:books,isbn'],
             'published_date' => ['required', 'date'],
             'description' => ['nullable', 'string'],
-            'image_url' => ['nullable', 'url', 'max:2048'],
+            'image_url' => ['nullable', 'url', 'max:255'],
             'genres' => ['required', 'array', 'min:1'],
             'genres.*' => ['integer', 'exists:genres,id'],
         ];
@@ -59,7 +59,7 @@ class StoreBookRequest extends FormRequest
             'description.string' => '説明は文字列で入力してください。',
 
             'image_url.url' => '画像URLは正しいURL形式で入力してください。',
-            'image_url.max' => '画像URLは2048文字以内で入力してください。',
+            'image_url.max' => '画像URLは255文字以内で入力してください。',
 
             'genres.required' => 'ジャンルを選択してください。',
             'genres.array' => 'ジャンルを正しく選択してください。',
