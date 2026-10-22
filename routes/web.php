@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // ゲストでも閲覧できる
@@ -27,21 +28,21 @@ Route::middleware('auth')->group(function () {
         return back();
     })->name('favorites.toggle');
 
-    Route::post('/books/{book}/reviews', function () {
-        return back();
-    })->name('reviews.store');
+    Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])
+        ->name('reviews.store');
 
     Route::prefix('reviews')->name('reviews.')->group(function () {
         Route::post('/{review}/like', function () {
             return back();
         })->name('like');
 
-        Route::get('/{review}/edit', function () {
-            return back();
-        })->name('edit');
+        Route::get('/{review}/edit', [ReviewController::class, 'edit'])
+            ->name('edit');
 
-        Route::delete('/{review}', function () {
-            return back();
-        })->name('destroy');
+        Route::put('/{review}', [ReviewController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{review}', [ReviewController::class, 'destroy'])
+            ->name('destroy');
     });
 });
