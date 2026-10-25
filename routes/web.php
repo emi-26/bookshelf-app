@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -19,14 +20,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('books', BookController::class)
         ->except(['index', 'show']);
 
-    Route::view('/favorites', 'favorites.index')->name('favorites.index');
+    Route::get('/favorites', [FavoriteController::class, 'index'])
+        ->name('favorites.index');
 
     Route::resource('genres', GenreController::class);
 
-    // 以下は各機能を実装するまでの仮ルート
-    Route::post('/books/{book}/favorite', function () {
-        return back();
-    })->name('favorites.toggle');
+    Route::post('/books/{book}/favorites', [FavoriteController::class, 'toggle'])
+        ->name('favorites.toggle');
 
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])
         ->name('reviews.store');
