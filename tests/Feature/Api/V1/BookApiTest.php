@@ -115,6 +115,41 @@ class BookApiTest extends TestCase
             ->assertJsonPath('data.0.title', '小説の本');
     }
 
+    public function test_book_list_uses_per_page_parameter(): void
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $book = $this->createBook(
+                'テスト書籍'.$i,
+                'テスト著者',
+                '97812345678'.sprintf('%02d', $i)
+            );
+
+            $book->genres()->attach($this->novelGenre->id);
+        }
+
+        $response = $this->getJson('/api/v1/books?per_page=2');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.per_page', 2);
+    }
+
+    public function test_book_list_validates_query_parameters(): void
+    {
+        $response = $this->getJson(
+            '/api/v1/books?genre_id=999&page=0&per_page=101'
+        );
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'genre_id',
+                'page',
+                'per_page',
+            ]);
+    }
+
     public function test_guest_can_get_book_detail(): void
     {
         $book = $this->createBook(

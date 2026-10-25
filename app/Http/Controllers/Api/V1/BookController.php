@@ -3,35 +3,46 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\BookIndexRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    public function index(Request $request)
+    public function index(BookIndexRequest $request)
     {
+        $validated = $request->validated();
+
         $books = Book::query()
             ->with('genres')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
-            ->when($request->keyword, function ($query, $keyword) {
-                $query->where(function ($query) use ($keyword) {
-                    $query->where('title', 'like', "%{$keyword}%")
-                        ->orWhere('author', 'like', "%{$keyword}%")
-                        ->orWhere('isbn', 'like', "%{$keyword}%");
-                });
-            })
-            ->when($request->genre_id, function ($query, $genreId) {
-                $query->whereHas('genres', function ($query) use ($genreId) {
-                    $query->where('genres.id', $genreId);
-                });
-            })
-            ->paginate(10);
+            ->when(
+                $validated['keyword'] ?? null,
+                function ($query, $keyword) {
+                    $query->where(function ($query) use ($keyword) {
+                        $query->where('title', 'like', "%{$keyword}%")
+                            ->orWhere('author', 'like', "%{$keyword}%")
+                            ->orWhere('isbn', 'like', "%{$keyword}%");
+                    });
+                }
+            )
+            ->when(
+                $validated['genre_id'] ?? null,
+                function ($query, $genreId) {
+                    $query->whereHas(
+                        'genres',
+                        function ($query) use ($genreId) {
+                            $query->where('genres.id', $genreId);
+                        }
+                    );
+                }
+            )
+            ->paginate($validated['per_page'] ?? 10);
 
         return BookResource::collection($books);
     }
@@ -43,7 +54,11 @@ class BookController extends Controller
 
         unset($validated['genres']);
 
-        $book = DB::transaction(function () use ($request, $validated, $genreIds) {
+        $book = DB::transaction(function () use (
+            $request,
+            $validated,
+            $genreIds
+        ) {
             $book = Book::create([
                 ...$validated,
                 'user_id' => $request->user()->id,
