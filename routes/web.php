@@ -5,6 +5,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewLikeController;
 use Illuminate\Support\Facades\Route;
 
 // ゲストでも閲覧できる
@@ -34,9 +35,8 @@ Route::middleware('auth')->group(function () {
         ->name('reviews.store');
 
     Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::post('/{review}/like', function () {
-            return back();
-        })->name('like');
+        Route::post('/{review}/like', [ReviewLikeController::class, 'toggle'])
+            ->name('like');
 
         Route::get('/{review}/edit', [ReviewController::class, 'edit'])
             ->name('edit');
