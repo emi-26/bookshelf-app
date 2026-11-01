@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\IsbnController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReadingPlanController;
 use App\Http\Controllers\ReportController;
@@ -23,6 +24,9 @@ Route::get('/ranking', [RankingController::class, 'index'])
 
 // ログインが必要
 Route::middleware('auth')->group(function () {
+    Route::get('/books/isbn/{isbn}', [IsbnController::class, 'show'])
+        ->name('books.isbn.show');
+
     Route::resource('books', BookController::class)
         ->except(['index', 'show']);
 
