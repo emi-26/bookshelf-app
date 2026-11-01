@@ -4,12 +4,14 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
 use Illuminate\Support\Facades\Route;
 
 // ゲストでも閲覧できる
-Route::get('/', [BookController::class, 'index'])->name('books.index');
+Route::get('/', [BookController::class, 'index'])
+    ->name('books.index');
 
 Route::get('/books/{book}', [BookController::class, 'show'])
     ->whereNumber('book')
@@ -27,6 +29,9 @@ Route::middleware('auth')->group(function () {
         ->name('favorites.index');
 
     Route::resource('genres', GenreController::class);
+
+    Route::get('/reports', [ReportController::class, 'index'])
+        ->name('reports.index');
 
     Route::post('/books/{book}/favorites', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
