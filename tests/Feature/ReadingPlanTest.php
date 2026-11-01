@@ -43,6 +43,31 @@ class ReadingPlanTest extends TestCase
         ]);
     }
 
+    public function test_duplicate_pending_plan_for_same_book_cannot_be_created(): void
+    {
+        $user = User::factory()->create();
+        $book = $this->createBook($user);
+
+        ReadingPlan::create([
+            'user_id' => $user->id,
+            'book_id' => $book->id,
+            'target_date' => now()->addWeek()->format('Y-m-d'),
+            'status' => ReadingPlanStatus::Pending,
+            'completed_at' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('reading-plans.store'), [
+                'book_id' => $book->id,
+                'target_date' => now()->addWeeks(2)->format('Y-m-d'),
+            ]);
+
+        $response->assertSessionHasErrors('book_id');
+
+        $this->assertDatabaseCount('reading_plans', 1);
+    }
+
     public function test_past_target_date_cannot_be_registered(): void
     {
         $user = User::factory()->create();
