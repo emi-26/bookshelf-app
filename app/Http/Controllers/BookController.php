@@ -7,17 +7,47 @@ use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $books = Book::with('genres')
+        $books = Book::query()
+            ->with('genres')
             ->withAvg('reviews', 'rating')
-            ->paginate(10);
+            ->when($request->keyword, function ($query, $keyword) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('title', 'like', "%{$keyword}%")
+                        ->orWhere('author', 'like', "%{$keyword}%");
+                });
+            })
+            ->when($request->genre, function ($query, $genreId) {
+                $query->whereHas('genres', function ($query) use ($genreId) {
+                    $query->where('genres.id', $genreId);
+                });
+            })
+            ->when(
+                $request->sort === 'oldest',
+                fn ($query) => $query->orderBy('created_at'),
+                function ($query) use ($request) {
+                    if ($request->sort === 'title') {
+                        $query->orderBy('title');
+                    } elseif ($request->sort === 'rating') {
+                        $query->orderByRaw('reviews_avg_rating IS NULL')
+                            ->orderByDesc('reviews_avg_rating');
+                    } else {
+                        $query->orderByDesc('created_at');
+                    }
+                }
+            )
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('books.index', compact('books'));
+        $genres = Genre::orderBy('name')->get();
+
+        return view('books.index', compact('books', 'genres'));
     }
 
     public function create(): View
@@ -68,8 +98,10 @@ class BookController extends Controller
         return view('books.edit', compact('book', 'genres'));
     }
 
-    public function update(UpdateBookRequest $request, Book $book): RedirectResponse
-    {
+    public function update(
+        UpdateBookRequest $request,
+        Book $book
+    ): RedirectResponse {
         $this->authorize('update', $book);
 
         $validated = $request->validated();
