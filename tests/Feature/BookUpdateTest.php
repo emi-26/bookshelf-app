@@ -74,6 +74,30 @@ class BookUpdateTest extends TestCase
         ]);
     }
 
+    public function test_book_can_be_updated_without_published_date(): void
+    {
+        $book = $this->createBook();
+
+        $response = $this->actingAs($this->user)
+            ->put(route('books.update', $book), [
+                'title' => '出版日なし書籍',
+                'author' => '更新後の著者',
+                'isbn' => $book->isbn,
+                'published_date' => null,
+                'description' => $book->description,
+                'image_url' => $book->image_url,
+                'genres' => [$this->genre->id],
+            ]);
+
+        $response->assertRedirect(route('books.show', $book));
+
+        $this->assertDatabaseHas('books', [
+            'id' => $book->id,
+            'title' => '出版日なし書籍',
+            'published_date' => null,
+        ]);
+    }
+
     public function test_other_user_cannot_update_book(): void
     {
         $book = $this->createBook();

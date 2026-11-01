@@ -63,6 +63,25 @@ class BookCreateTest extends TestCase
         ]);
     }
 
+    public function test_book_can_be_created_without_published_date(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post(route('books.store'), [
+                'title' => '出版日なし書籍',
+                'author' => 'テスト著者',
+                'isbn' => '9781234567896',
+                'published_date' => null,
+                'genres' => [$this->genre->id],
+            ]);
+
+        $response->assertRedirect(route('books.index'));
+
+        $this->assertDatabaseHas('books', [
+            'title' => '出版日なし書籍',
+            'published_date' => null,
+        ]);
+    }
+
     public function test_book_creation_requires_required_fields(): void
     {
         $response = $this->actingAs($this->user)
@@ -72,9 +91,10 @@ class BookCreateTest extends TestCase
             'title',
             'author',
             'isbn',
-            'published_date',
             'genres',
         ]);
+
+        $response->assertSessionDoesntHaveErrors('published_date');
     }
 
     public function test_book_creation_requires_thirteen_digit_isbn(): void

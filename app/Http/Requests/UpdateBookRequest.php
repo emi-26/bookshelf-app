@@ -30,7 +30,7 @@ class UpdateBookRequest extends FormRequest
                 'digits:13',
                 Rule::unique('books', 'isbn')->ignore($this->route('book')),
             ],
-            'published_date' => ['required', 'date'],
+            'published_date' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:255'],
             'genres' => ['required', 'array', 'min:1'],
@@ -58,7 +58,6 @@ class UpdateBookRequest extends FormRequest
             'isbn.digits' => 'ISBNは13桁の数字で入力してください。',
             'isbn.unique' => 'このISBNは既に登録されています。',
 
-            'published_date.required' => '出版日を入力してください。',
             'published_date.date' => '出版日を正しい日付で入力してください。',
 
             'description.string' => '説明は文字列で入力してください。',
