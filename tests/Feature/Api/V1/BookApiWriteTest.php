@@ -24,6 +24,7 @@ class BookApiWriteTest extends TestCase
         parent::setUp();
 
         $this->owner = User::factory()->create();
+
         $this->otherUser = User::factory()->create();
 
         $this->genre = Genre::create([
@@ -66,7 +67,6 @@ class BookApiWriteTest extends TestCase
                 'title',
                 'author',
                 'isbn',
-                'published_date',
                 'genres',
             ]);
     }
