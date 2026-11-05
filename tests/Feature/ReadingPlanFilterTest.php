@@ -19,9 +19,9 @@ class ReadingPlanFilterTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $pendingPlan = $this->createPlan(
+        $inProgressPlan = $this->createPlan(
             $user,
-            ReadingPlanStatus::Pending
+            ReadingPlanStatus::InProgress
         );
 
         $this->createPlan(
@@ -32,14 +32,14 @@ class ReadingPlanFilterTest extends TestCase
         $this->actingAs($user);
 
         $request = Request::create('/reading-plans', 'GET', [
-            'status' => ReadingPlanStatus::Pending->value,
+            'status' => ReadingPlanStatus::InProgress->value,
         ]);
 
         $view = app(ReadingPlanController::class)->index($request);
         $readingPlans = $view->getData()['readingPlans'];
 
         $this->assertCount(1, $readingPlans);
-        $this->assertSame($pendingPlan->id, $readingPlans->first()->id);
+        $this->assertSame($inProgressPlan->id, $readingPlans->first()->id);
     }
 
     public function test_user_cannot_update_another_users_plan(): void
@@ -49,7 +49,7 @@ class ReadingPlanFilterTest extends TestCase
 
         $plan = $this->createPlan(
             $otherUser,
-            ReadingPlanStatus::Pending
+            ReadingPlanStatus::InProgress
         );
 
         $response = $this

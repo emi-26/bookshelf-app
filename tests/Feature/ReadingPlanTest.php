@@ -39,11 +39,11 @@ class ReadingPlanTest extends TestCase
         $this->assertDatabaseHas('reading_plans', [
             'user_id' => $user->id,
             'book_id' => $book->id,
-            'status' => ReadingPlanStatus::Pending->value,
+            'status' => ReadingPlanStatus::InProgress->value,
         ]);
     }
 
-    public function test_duplicate_pending_plan_for_same_book_cannot_be_created(): void
+    public function test_duplicate_in_progress_plan_for_same_book_cannot_be_created(): void
     {
         $user = User::factory()->create();
         $book = $this->createBook($user);
@@ -52,7 +52,7 @@ class ReadingPlanTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'target_date' => now()->addWeek()->format('Y-m-d'),
-            'status' => ReadingPlanStatus::Pending,
+            'status' => ReadingPlanStatus::InProgress,
             'completed_at' => null,
         ]);
 
@@ -169,7 +169,7 @@ class ReadingPlanTest extends TestCase
             'user_id' => $user->id,
             'book_id' => $book->id,
             'target_date' => now()->addWeek()->format('Y-m-d'),
-            'status' => ReadingPlanStatus::Pending,
+            'status' => ReadingPlanStatus::InProgress,
             'completed_at' => null,
         ]);
     }
