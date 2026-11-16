@@ -13,6 +13,13 @@ use Illuminate\View\View;
 
 class BookController extends Controller
 {
+    /**
+     * 書籍一覧を検索条件に応じて取得し、表示する。
+     *
+     * タイトル・著者名による検索、ジャンルの絞り込み、
+     * 登録日時・タイトル・平均評価による並び替えに対応する。
+     * 検索結果は10件ずつページネーションする。
+     */
     public function index(Request $request): View
     {
         $books = Book::query()
