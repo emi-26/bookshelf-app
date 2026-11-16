@@ -58,7 +58,7 @@ class ReadingPlanController extends Controller
 
     public function edit(ReadingPlan $readingPlan): View
     {
-        $this->ensureOwner($readingPlan);
+        $this->authorize('update', $readingPlan);
 
         $readingPlan->load('book');
 
@@ -72,7 +72,7 @@ class ReadingPlanController extends Controller
         UpdateReadingPlanRequest $request,
         ReadingPlan $readingPlan
     ): RedirectResponse {
-        $this->ensureOwner($readingPlan);
+        $this->authorize('update', $readingPlan);
 
         $readingPlan->update([
             'target_date' => $request->validated('target_date'),
@@ -86,7 +86,7 @@ class ReadingPlanController extends Controller
     public function complete(
         ReadingPlan $readingPlan
     ): RedirectResponse {
-        $this->ensureOwner($readingPlan);
+        $this->authorize('update', $readingPlan);
 
         $readingPlan->update([
             'status' => ReadingPlanStatus::Completed,
@@ -101,20 +101,12 @@ class ReadingPlanController extends Controller
     public function destroy(
         ReadingPlan $readingPlan
     ): RedirectResponse {
-        $this->ensureOwner($readingPlan);
+        $this->authorize('delete', $readingPlan);
 
         $readingPlan->delete();
 
         return redirect()
             ->route('reading-plans.index')
             ->with('success', '読書計画を削除しました。');
-    }
-
-    private function ensureOwner(ReadingPlan $readingPlan): void
-    {
-        abort_unless(
-            $readingPlan->user_id === auth()->id(),
-            403
-        );
     }
 }
