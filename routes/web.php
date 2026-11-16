@@ -13,7 +13,9 @@ use App\Http\Controllers\ReviewLikeController;
 use Illuminate\Support\Facades\Route;
 
 // ゲストでも閲覧できる
-Route::get('/', [BookController::class, 'index'])
+Route::get('/', [BookController::class, 'index']);
+
+Route::get('/books', [BookController::class, 'index'])
     ->name('books.index');
 
 Route::get('/books/{book}', [BookController::class, 'show'])
