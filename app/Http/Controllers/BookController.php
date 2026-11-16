@@ -8,6 +8,7 @@ use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -61,17 +62,19 @@ class BookController extends Controller
     {
         $validated = $request->validated();
 
-        $book = Book::create([
-            'user_id' => $request->user()->id,
-            'title' => $validated['title'],
-            'author' => $validated['author'],
-            'isbn' => $validated['isbn'],
-            'published_date' => $validated['published_date'],
-            'description' => $validated['description'] ?? null,
-            'image_url' => $validated['image_url'] ?? null,
-        ]);
+        DB::transaction(function () use ($request, $validated) {
+            $book = Book::create([
+                'user_id' => $request->user()->id,
+                'title' => $validated['title'],
+                'author' => $validated['author'],
+                'isbn' => $validated['isbn'],
+                'published_date' => $validated['published_date'],
+                'description' => $validated['description'] ?? null,
+                'image_url' => $validated['image_url'] ?? null,
+            ]);
 
-        $book->genres()->sync($validated['genres']);
+            $book->genres()->sync($validated['genres']);
+        });
 
         return redirect()
             ->route('books.index')
@@ -93,6 +96,7 @@ class BookController extends Controller
         $this->authorize('update', $book);
 
         $book->load('genres');
+
         $genres = Genre::all();
 
         return view('books.edit', compact('book', 'genres'));
@@ -106,16 +110,18 @@ class BookController extends Controller
 
         $validated = $request->validated();
 
-        $book->update([
-            'title' => $validated['title'],
-            'author' => $validated['author'],
-            'isbn' => $validated['isbn'],
-            'published_date' => $validated['published_date'],
-            'description' => $validated['description'] ?? null,
-            'image_url' => $validated['image_url'] ?? null,
-        ]);
+        DB::transaction(function () use ($book, $validated) {
+            $book->update([
+                'title' => $validated['title'],
+                'author' => $validated['author'],
+                'isbn' => $validated['isbn'],
+                'published_date' => $validated['published_date'],
+                'description' => $validated['description'] ?? null,
+                'image_url' => $validated['image_url'] ?? null,
+            ]);
 
-        $book->genres()->sync($validated['genres']);
+            $book->genres()->sync($validated['genres']);
+        });
 
         return redirect()
             ->route('books.show', $book)
