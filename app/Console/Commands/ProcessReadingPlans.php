@@ -40,15 +40,17 @@ class ProcessReadingPlans extends Command
                 );
             }
 
-            if ($daysFromTarget === -3) {
+            if ($daysFromTarget <= -3) {
                 $readingPlan->update([
                     'status' => ReadingPlanStatus::Expired,
                 ]);
 
-                $this->notify(
-                    $readingPlan,
-                    'three_days_after'
-                );
+                if ($daysFromTarget === -3) {
+                    $this->notify(
+                        $readingPlan,
+                        'three_days_after'
+                    );
+                }
             }
         }
 
@@ -59,6 +61,16 @@ class ProcessReadingPlans extends Command
         ReadingPlan $readingPlan,
         string $timing
     ): void {
+        $alreadyNotified = $readingPlan->user
+            ->notifications()
+            ->where('data->reading_plan_id', $readingPlan->id)
+            ->where('data->timing', $timing)
+            ->exists();
+
+        if ($alreadyNotified) {
+            return;
+        }
+
         $readingPlan->user->notify(
             new ReadingPlanReminderNotification(
                 $readingPlan,
