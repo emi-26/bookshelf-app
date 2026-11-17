@@ -9,6 +9,7 @@ use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -22,7 +23,14 @@ class BookController extends Controller
      */
     public function index(Request $request): View
     {
-        $books = Book::query()
+        $request->validate([
+            'sort' => [
+                'nullable',
+                Rule::in(['latest', 'oldest', 'title', 'rating']),
+            ],
+        ]);
+
+        $query = Book::query()
             ->with('genres')
             ->withAvg('reviews', 'rating')
             ->when($request->keyword, function ($query, $keyword) {
@@ -35,21 +43,29 @@ class BookController extends Controller
                 $query->whereHas('genres', function ($query) use ($genreId) {
                     $query->where('genres.id', $genreId);
                 });
-            })
-            ->when(
-                $request->sort === 'oldest',
-                fn ($query) => $query->orderBy('created_at'),
-                function ($query) use ($request) {
-                    if ($request->sort === 'title') {
-                        $query->orderBy('title');
-                    } elseif ($request->sort === 'rating') {
-                        $query->orderByRaw('reviews_avg_rating IS NULL')
-                            ->orderByDesc('reviews_avg_rating');
-                    } else {
-                        $query->orderByDesc('created_at');
-                    }
-                }
-            )
+            });
+
+        switch ($request->input('sort', 'latest')) {
+            case 'oldest':
+                $query->orderBy('created_at');
+                break;
+
+            case 'title':
+                $query->orderBy('title');
+                break;
+
+            case 'rating':
+                $query->orderByRaw('reviews_avg_rating IS NULL')
+                    ->orderByDesc('reviews_avg_rating');
+                break;
+
+            case 'latest':
+            default:
+                $query->orderByDesc('created_at');
+                break;
+        }
+
+        $books = $query
             ->paginate(10)
             ->withQueryString();
 
