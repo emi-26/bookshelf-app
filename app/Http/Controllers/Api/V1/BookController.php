@@ -42,7 +42,7 @@ class BookController extends Controller
                     );
                 }
             )
-            ->paginate($validated['per_page'] ?? 10);
+            ->paginate($validated['per_page'] ?? 20);
 
         return BookResource::collection($books);
     }

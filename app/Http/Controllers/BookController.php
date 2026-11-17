@@ -69,7 +69,7 @@ class BookController extends Controller
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($request, $validated) {
+        $book = DB::transaction(function () use ($request, $validated) {
             $book = Book::create([
                 'user_id' => $request->user()->id,
                 'title' => $validated['title'],
@@ -81,10 +81,12 @@ class BookController extends Controller
             ]);
 
             $book->genres()->sync($validated['genres']);
+
+            return $book;
         });
 
         return redirect()
-            ->route('books.index')
+            ->route('books.show', $book)
             ->with('success', '書籍を登録しました。');
     }
 

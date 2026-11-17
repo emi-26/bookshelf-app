@@ -47,15 +47,15 @@ class BookCreateTest extends TestCase
                 'genres' => [$this->genre->id],
             ]);
 
-        $response->assertRedirect(route('books.index'));
+        $book = Book::where('isbn', '9781234567897')->firstOrFail();
+
+        $response->assertRedirect(route('books.show', $book));
 
         $this->assertDatabaseHas('books', [
             'user_id' => $this->user->id,
             'title' => 'テスト書籍',
             'isbn' => '9781234567897',
         ]);
-
-        $book = Book::where('isbn', '9781234567897')->firstOrFail();
 
         $this->assertDatabaseHas('book_genre', [
             'book_id' => $book->id,
@@ -74,7 +74,9 @@ class BookCreateTest extends TestCase
                 'genres' => [$this->genre->id],
             ]);
 
-        $response->assertRedirect(route('books.index'));
+        $book = Book::where('isbn', '9781234567896')->firstOrFail();
+
+        $response->assertRedirect(route('books.show', $book));
 
         $this->assertDatabaseHas('books', [
             'title' => '出版日なし書籍',
