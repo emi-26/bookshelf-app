@@ -149,6 +149,15 @@ Apple Silicon環境向けのMySQL設定（`platform: linux/amd64`）とphpMyAdmi
 
 一覧APIは `keyword`、`genre_id`、`page`、`per_page` などのクエリパラメータに対応します。存在しない書籍へのアクセスは404、未認証の書き込みは401、権限のない更新・削除は403を返します。
 
+## URL
+
+- アプリ：http://localhost
+- ログイン：http://localhost/login
+- 会員登録：http://localhost/register
+- 書籍一覧：http://localhost/books
+- phpMyAdmin：http://localhost:8080
+
+
 ## ER図
 
 ![BookShelf ER図](docs/er-diagram.png)
