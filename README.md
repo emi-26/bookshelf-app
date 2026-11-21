@@ -40,7 +40,11 @@ Docker Desktop、Gitを利用できる環境を用意してください。
 
 ### 1. プロジェクトを取得
 
-GitHubリポジトリの作成後、リポジトリをクローンし、プロジェクトのルートディレクトリへ移動してください。
+以下のコマンドでGitHubからリポジトリをクローンします。
+
+```bash
+git clone https://github.com/emi-26/bookshelf-app.git
+cd bookshelf-app
 
 ### 2. PHPの依存パッケージをインストール
 
