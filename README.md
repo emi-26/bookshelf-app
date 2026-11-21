@@ -45,6 +45,7 @@ Docker Desktop、Gitを利用できる環境を用意してください。
 ```bash
 git clone https://github.com/emi-26/bookshelf-app.git
 cd bookshelf-app
+```
 
 ### 2. PHPの依存パッケージをインストール
 
