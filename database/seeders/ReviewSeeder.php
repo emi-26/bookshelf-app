@@ -44,8 +44,17 @@ class ReviewSeeder extends Seeder
             ],
         ];
 
-        foreach ($books as $book) {
-            $reviewCount = rand(2, 4);
+        // 各書籍2〜4件、合計32件になるまで件数を決める
+        do {
+            $reviewCounts = [];
+
+            foreach ($books as $book) {
+                $reviewCounts[] = rand(2, 4);
+            }
+        } while (array_sum($reviewCounts) !== 32);
+
+        foreach ($books as $index => $book) {
+            $reviewCount = $reviewCounts[$index];
             $selectedUsers = $users->random($reviewCount);
 
             foreach ($selectedUsers as $user) {

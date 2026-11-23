@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Review;
-use App\Models\ReviewLike;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,29 +16,26 @@ class ReviewLikeSeeder extends Seeder
         $users = User::all();
         $reviews = Review::all();
 
-        $likes = [
-            [0, 0],
-            [1, 0],
-            [2, 1],
-            [3, 1],
-            [4, 2],
-            [0, 3],
-            [1, 4],
-            [2, 5],
-            [3, 6],
-            [4, 7],
-            [0, 8],
-            [1, 9],
-            [2, 10],
-            [3, 11],
-            [4, 12],
-        ];
+        foreach ($reviews as $review) {
+            // レビュー投稿者をいいね対象から除外する
+            $eligibleUserIds = $users
+                ->where('id', '!=', $review->user_id)
+                ->pluck('id')
+                ->shuffle();
 
-        foreach ($likes as [$userIndex, $reviewIndex]) {
-            ReviewLike::firstOrCreate([
-                'user_id' => $users[$userIndex]->id,
-                'review_id' => $reviews[$reviewIndex]->id,
-            ]);
+            // 各レビューに0〜3人のいいねを設定する
+            $likeCount = random_int(
+                0,
+                min(3, $eligibleUserIds->count())
+            );
+
+            $selectedUserIds = $eligibleUserIds
+                ->take($likeCount)
+                ->all();
+
+            // 既存の関連を維持しながらいいねを登録する
+            $review->likedByUsers()
+                ->syncWithoutDetaching($selectedUserIds);
         }
     }
 }
