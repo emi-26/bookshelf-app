@@ -42,7 +42,7 @@ class IsbnController extends Controller
 
         return response()->json([
             'title' => $item['title'] ?? '',
-            'author' => collect($item['authors'] ?? [12])->join(', '),
+            'author' => collect($item['authors'] ?? [])->join(', '),
             'description' => $item['description'] ?? '',
             'image_url' => $item['imageLinks']['thumbnail'] ?? '',
             'published_date' => $item['publishedDate'] ?? '',
