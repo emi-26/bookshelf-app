@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\BookController;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class BookSortTest extends TestCase
@@ -129,13 +128,14 @@ class BookSortTest extends TestCase
         $this->assertSame($noReviewBook->id, $books->get(2)->id);
     }
 
-    private function getBooks(array $parameters)
+    private function getBooks(array $parameters): Collection
     {
-        $request = Request::create('/', 'GET', $parameters);
+        $response = $this->get('/books?'.http_build_query($parameters));
 
-        $view = app(BookController::class)->index($request);
+        $response->assertOk();
+        $response->assertViewIs('books.index');
 
-        return $view->getData()['books']->getCollection();
+        return $response->viewData('books')->getCollection();
     }
 
     private function createBook(

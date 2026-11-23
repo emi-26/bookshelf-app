@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookIndexRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -21,15 +20,8 @@ class BookController extends Controller
      * 登録日時・タイトル・平均評価による並び替えに対応する。
      * 検索結果は10件ずつページネーションする。
      */
-    public function index(Request $request): View
+    public function index(BookIndexRequest $request): View
     {
-        $request->validate([
-            'sort' => [
-                'nullable',
-                Rule::in(['latest', 'oldest', 'title', 'rating']),
-            ],
-        ]);
-
         $query = Book::query()
             ->with('genres')
             ->withAvg('reviews', 'rating')
