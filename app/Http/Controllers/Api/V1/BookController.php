@@ -8,12 +8,14 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    public function index(BookIndexRequest $request)
+    public function index(BookIndexRequest $request): AnonymousResourceCollection
     {
         $validated = $request->validated();
 
@@ -47,7 +49,7 @@ class BookController extends Controller
         return BookResource::collection($books);
     }
 
-    public function store(StoreBookRequest $request)
+    public function store(StoreBookRequest $request): JsonResponse
     {
         $validated = $request->validated();
         $genreIds = $validated['genres'];
