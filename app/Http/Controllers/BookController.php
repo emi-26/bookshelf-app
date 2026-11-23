@@ -91,7 +91,7 @@ class BookController extends Controller
                 'title' => $validated['title'],
                 'author' => $validated['author'],
                 'isbn' => $validated['isbn'],
-                'published_date' => $validated['published_date'],
+                'published_date' => $validated['published_date'] ?? null,
                 'description' => $validated['description'] ?? null,
                 'image_url' => $validated['image_url'] ?? null,
             ]);
@@ -140,7 +140,7 @@ class BookController extends Controller
                 'title' => $validated['title'],
                 'author' => $validated['author'],
                 'isbn' => $validated['isbn'],
-                'published_date' => $validated['published_date'],
+                'published_date' => $validated['published_date'] ?? null,
                 'description' => $validated['description'] ?? null,
                 'image_url' => $validated['image_url'] ?? null,
             ]);
