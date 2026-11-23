@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IsbnSearchRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 
@@ -14,18 +15,14 @@ class IsbnController extends Controller
      * 書籍が見つからない場合は404を返す。
      * 取得成功時は書籍情報をJSON形式で返す。
      */
-    public function show(string $isbn): JsonResponse
+    public function show(IsbnSearchRequest $request, string $isbn): JsonResponse
     {
-        if (! preg_match('/^\d{13}$/', $isbn)) {
-            return response()->json([
-                'error' => 'ISBNは13桁で入力してください。',
-            ], 422);
-        }
+        $validated = $request->validated();
 
         $response = Http::get(
             'https://www.googleapis.com/books/v1/volumes',
             [
-                'q' => "isbn:{$isbn}",
+                'q' => "isbn:{$validated['isbn']}",
             ]
         );
 
@@ -45,7 +42,7 @@ class IsbnController extends Controller
 
         return response()->json([
             'title' => $item['title'] ?? '',
-            'author' => collect($item['authors'] ?? [])->join(', '),
+            'author' => collect($item['authors'] ?? [12])->join(', '),
             'description' => $item['description'] ?? '',
             'image_url' => $item['imageLinks']['thumbnail'] ?? '',
             'published_date' => $item['publishedDate'] ?? '',
