@@ -31,12 +31,14 @@ class ProcessReadingPlansEdgeCaseTest extends TestCase
     public function test_three_days_before_notification_is_not_duplicated(): void
     {
         $user = User::factory()->create();
+
         $this->createPlan($user, today()->addDays(3));
 
         $this->artisan('reading-plans:process')->assertExitCode(0);
         $this->artisan('reading-plans:process')->assertExitCode(0);
 
         $this->assertDatabaseCount('notifications', 1);
+
         $this->assertSame(
             'three_days_before',
             $user->notifications()->first()->data['timing']
@@ -46,14 +48,41 @@ class ProcessReadingPlansEdgeCaseTest extends TestCase
     public function test_on_due_date_notification_is_not_duplicated(): void
     {
         $user = User::factory()->create();
+
         $this->createPlan($user, today());
 
         $this->artisan('reading-plans:process')->assertExitCode(0);
         $this->artisan('reading-plans:process')->assertExitCode(0);
 
         $this->assertDatabaseCount('notifications', 1);
+
         $this->assertSame(
             'on_due_date',
+            $user->notifications()->first()->data['timing']
+        );
+    }
+
+    public function test_three_days_after_notification_is_not_duplicated(): void
+    {
+        $user = User::factory()->create();
+
+        $plan = $this->createPlan(
+            $user,
+            today()->subDays(3)
+        );
+
+        $this->artisan('reading-plans:process')->assertExitCode(0);
+        $this->artisan('reading-plans:process')->assertExitCode(0);
+
+        $this->assertSame(
+            ReadingPlanStatus::Expired,
+            $plan->fresh()->status
+        );
+
+        $this->assertDatabaseCount('notifications', 1);
+
+        $this->assertSame(
+            'three_days_after',
             $user->notifications()->first()->data['timing']
         );
     }
@@ -61,6 +90,7 @@ class ProcessReadingPlansEdgeCaseTest extends TestCase
     public function test_plan_expires_when_four_days_past_target_date(): void
     {
         $user = User::factory()->create();
+
         $plan = $this->createPlan($user, today()->subDays(4));
 
         $this->artisan('reading-plans:process')->assertExitCode(0);
