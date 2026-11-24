@@ -112,13 +112,31 @@ class FavoriteTest extends TestCase
     public function test_toggle_does_not_create_duplicate_favorites(): void
     {
         $this->actingAs($this->user)
-            ->post(route('favorites.toggle', $this->book));
+            ->post(route('favorites.toggle', $this->book))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('favorites', [
+            'user_id' => $this->user->id,
+            'book_id' => $this->book->id,
+        ]);
 
         $this->actingAs($this->user)
-            ->post(route('favorites.toggle', $this->book));
+            ->post(route('favorites.toggle', $this->book))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('favorites', [
+            'user_id' => $this->user->id,
+            'book_id' => $this->book->id,
+        ]);
 
         $this->actingAs($this->user)
-            ->post(route('favorites.toggle', $this->book));
+            ->post(route('favorites.toggle', $this->book))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('favorites', [
+            'user_id' => $this->user->id,
+            'book_id' => $this->book->id,
+        ]);
 
         $this->assertDatabaseCount('favorites', 1);
     }
