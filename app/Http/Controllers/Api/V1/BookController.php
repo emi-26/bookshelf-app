@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
+    /**
+     * 書籍一覧を検索条件に応じて取得する。
+     *
+     * タイトル・著者名・ISBNによる検索、ジャンルの絞り込みに対応する。
+     * 検索結果は指定された件数（デフォルト20件）でページネーションする。
+     */
     public function index(BookIndexRequest $request): AnonymousResourceCollection
     {
         $validated = $request->validated();
@@ -49,11 +55,16 @@ class BookController extends Controller
         return BookResource::collection($books);
     }
 
+    /**
+     * 書籍を登録し、選択されたジャンルを関連付ける。
+     *
+     * 登録処理はトランザクション内で行い、
+     * 登録した書籍情報をHTTPステータス201で返す。
+     */
     public function store(StoreBookRequest $request): JsonResponse
     {
         $validated = $request->validated();
         $genreIds = $validated['genres'];
-
         unset($validated['genres']);
 
         $book = DB::transaction(function () use (
@@ -92,6 +103,12 @@ class BookController extends Controller
         return new BookResource($book);
     }
 
+    /**
+     * 書籍情報と関連するジャンルを更新する。
+     *
+     * 所有者の認可を行い、更新処理はトランザクション内で行う。
+     * 更新後の書籍情報を返す。
+     */
     public function update(
         UpdateBookRequest $request,
         Book $book
@@ -100,7 +117,6 @@ class BookController extends Controller
 
         $validated = $request->validated();
         $genreIds = $validated['genres'];
-
         unset($validated['genres']);
 
         DB::transaction(function () use ($book, $validated, $genreIds) {

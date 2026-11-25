@@ -74,7 +74,7 @@ class ReviewSeederTest extends TestCase
         $likes = DB::table('review_likes')->get();
 
         $uniqueLikes = $likes->unique(
-            fn ($like) => $like->user_id . '-' . $like->review_id
+            fn ($like) => $like->user_id.'-'.$like->review_id
         );
 
         $this->assertCount(

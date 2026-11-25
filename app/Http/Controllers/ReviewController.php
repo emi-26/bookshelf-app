@@ -12,6 +12,12 @@ use Illuminate\View\View;
 
 class ReviewController extends Controller
 {
+    /**
+     * ログインユーザーのレビューを登録する。
+     *
+     * 同一ユーザーによる同一書籍への重複投稿を防止し、
+     * 投稿済みの場合はエラーメッセージを返す。
+     */
     public function store(StoreReviewRequest $request, Book $book): RedirectResponse
     {
         $alreadyReviewed = $book->reviews()

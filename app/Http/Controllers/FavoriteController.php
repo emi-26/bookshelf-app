@@ -18,6 +18,9 @@ class FavoriteController extends Controller
         return view('favorites.index', compact('books'));
     }
 
+    /**
+     * ログインユーザーのお気に入り登録・解除を切り替える。
+     */
     public function toggle(Book $book): RedirectResponse
     {
         Auth::user()
