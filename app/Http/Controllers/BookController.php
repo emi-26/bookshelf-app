@@ -73,6 +73,11 @@ class BookController extends Controller
         return view('books.create', compact('genres'));
     }
 
+    /**
+     * 書籍を登録し、選択されたジャンルを関連付ける。
+     *
+     * 書籍とジャンルの関連付けはトランザクション内で行う。
+     */
     public function store(StoreBookRequest $request): RedirectResponse
     {
         $validated = $request->validated();
@@ -114,12 +119,16 @@ class BookController extends Controller
         $this->authorize('update', $book);
 
         $book->load('genres');
-
         $genres = Genre::all();
 
         return view('books.edit', compact('book', 'genres'));
     }
 
+    /**
+     * 書籍情報と関連するジャンルを更新する。
+     *
+     * 所有者の認可を行い、更新処理はトランザクション内で行う。
+     */
     public function update(
         UpdateBookRequest $request,
         Book $book

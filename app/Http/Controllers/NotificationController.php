@@ -18,6 +18,11 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
+    /**
+     * ログインユーザー自身の通知を既読にする。
+     *
+     * 対象の通知が存在しない場合は404を返す。
+     */
     public function read(Request $request, string $notificationId): RedirectResponse
     {
         $notification = $request->user()
