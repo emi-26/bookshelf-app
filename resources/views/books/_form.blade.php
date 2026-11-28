@@ -1,8 +1,13 @@
 @php
     $bookGenreIds = isset($book) ? $book->genres->pluck('id')->toArray() : [];
+
+    $selectedGenreIds = session()->hasOldInput()
+        ? old('genres', [])
+        : $bookGenreIds;
 @endphp
 
 @csrf
+
 <div class="space-y-6">
     <!-- タイトル -->
     <div>
@@ -97,7 +102,7 @@
                         <label class="inline-flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded">
                             <input type="checkbox" name="genres[]" value="{{ $genre->id }}"
                                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                @if(in_array($genre->id, old('genres', $bookGenreIds))) checked @endif>
+                                @checked(in_array($genre->id, $selectedGenreIds))>
                             <span class="ml-2 text-sm text-gray-700">{{ $genre->name }}</span>
                         </label>
                     @endforeach

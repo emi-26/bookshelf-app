@@ -16,6 +16,18 @@ class UpdateBookRequest extends FormRequest
     }
 
     /**
+     * Webフォームでジャンルが未選択の場合は空配列に変換する。
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->routeIs('books.update') && $this->missing('genres')) {
+            $this->merge([
+                'genres' => [],
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
@@ -49,22 +61,16 @@ class UpdateBookRequest extends FormRequest
             'title.required' => 'タイトルを入力してください。',
             'title.string' => 'タイトルは文字列で入力してください。',
             'title.max' => 'タイトルは255文字以内で入力してください。',
-
             'author.required' => '著者を入力してください。',
             'author.string' => '著者は文字列で入力してください。',
             'author.max' => '著者は255文字以内で入力してください。',
-
             'isbn.required' => 'ISBNを入力してください。',
             'isbn.digits' => 'ISBNは13桁の数字で入力してください。',
             'isbn.unique' => 'このISBNは既に登録されています。',
-
             'published_date.date' => '出版日を正しい日付で入力してください。',
-
             'description.string' => '説明は文字列で入力してください。',
-
             'image_url.url' => '画像URLは正しいURL形式で入力してください。',
             'image_url.max' => '画像URLは255文字以内で入力してください。',
-
             'genres.required' => 'ジャンルを選択してください。',
             'genres.array' => 'ジャンルを正しく選択してください。',
             'genres.min' => 'ジャンルを1つ以上選択してください。',
